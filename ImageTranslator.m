@@ -31,9 +31,9 @@ for i=1:1:xlim
     for j=1:1:ylim
         if I_dbl(j,i)<65
             s(j,i)=3;
-        elseif I_dbl(j,i)<140
-            s(j,i)=2;
         elseif I_dbl(j,i)<200
+            s(j,i)=2;
+        elseif I_dbl(j,i)<0
             s(j,i)=1;
         else 
             s(j,i)=0;
@@ -43,5 +43,5 @@ end
 
 figure(1);
 draw_func(s,I_dbl)
-%figure(2);
-%imshow(I);
+figure(2);
+imshow(I);

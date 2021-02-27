@@ -15,7 +15,7 @@ function [Path] = Pathfinder3(shade)
     for w=1:xlim
         for v=1:ylim
             if shade(v,w)==0
-                archive(v,w)=0;
+                archive(v,w)==0
             end
         end
     end
@@ -31,7 +31,7 @@ function [Path] = Pathfinder3(shade)
             xlist(count)=i;
             ylist(count)=j;
             count=count+1;
-        elseif archive(j,i)==1 && shade(j,i)==1 && mrhouse>90
+        elseif archive(j,i)==1 && shade(j,i)==1 && mrhouse>95
             xlist(count)=i;
             ylist(count)=j;
             count=count+1;
