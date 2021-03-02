@@ -1,4 +1,4 @@
-function [CenterPath] = draw_func(shade,image)
+function [] = draw_func(shade,image)
     figure
     h=animatedline;
     axis([0,875,0,640])
@@ -11,6 +11,6 @@ function [CenterPath] = draw_func(shade,image)
         y(count)=CompletedPath(2,count)+(640-ysize)/2;
         addpoints(h,x(count),y(count))
     end
-    CenterPath=cat(1,x,y);
+    CenterPath=cat(1,x)
 end
 

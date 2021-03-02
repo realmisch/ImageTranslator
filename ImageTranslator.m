@@ -42,6 +42,6 @@ for i=1:1:xlim
 end
 
 figure(1);
-draw_func(s,I_dbl)
+CenterPath=draw_func(s,I_dbl);
 figure(3);
 imshow(I);
