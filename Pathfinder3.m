@@ -24,19 +24,20 @@ function [Path] = Pathfinder3(shade)
 
     %Main Pathfinder
     while sumcheck~=0
-        disp(ceil(sumcheck*0.001))
-        %MrHouse is in charge of gambling
+        disp(ceil(sumcheck*0.0001))
+        %MrHouse is in charge of gambling, random probability if a shade
+        %pixel is visited
         mrhouse=randi([1,100]);
         %Creating the path, with probabilities for non-blackspace pixels
         if archive(j,i)==1 && shade(j,i)==3
             xlist(count)=i;
             ylist(count)=j;
             count=count+1;
-        elseif archive(j,i)==1 && shade(j,i)==2 && mrhouse>90
+        elseif archive(j,i)==1 && shade(j,i)==2 && mrhouse>96
             xlist(count)=i;
             ylist(count)=j;
             count=count+1;
-        elseif archive(j,i)==1 && shade(j,i)==1 && mrhouse>90
+        elseif archive(j,i)==1 && shade(j,i)==1 && mrhouse>99
             xlist(count)=i;
             ylist(count)=j;
             count=count+1;
