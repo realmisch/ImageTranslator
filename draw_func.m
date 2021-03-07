@@ -1,9 +1,10 @@
 function [CenterPath] = draw_func(shade,image)
-    figure
+    CompletedPath=Pathfinder3(shade);
+    figure(1);
     h=animatedline;
+    res=5;
     axis([0,875,0,640])
     [ysize,xsize]=size(image);
-    CompletedPath=Pathfinder3(shade);
     addpoints(h,1,1)
     for count=1:length(CompletedPath)
         %Centering the image assuming Etch-A-Sketch bounds
