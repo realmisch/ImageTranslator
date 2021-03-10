@@ -8,15 +8,17 @@ I_color = imread('shield.png');
 I = rgb2gray(I_color);
 I_dbl = double(I);
 [ylim,xlim]=size(I_dbl);
-orientation='right';
+orientation='down';
 
 %Shade Values for every pixel
 s=[];    
 s=zeros([875,640]);
 
 res=10;
-paint=1;
+paintit=1;
 
+%Checks orientation and changes image. Orientation from bottom of image.
+%'down' is default
 if strcmp(orientation,'up')==1
     I_dbl=flip(I_dbl);
 elseif strcmp(orientation,'left')==1
@@ -51,11 +53,11 @@ for i=1:1:xlim
         else 
             s(j,i)=0;
         end
-        if paint>=res && s(j,i)~=0
+        if paintit>=res && s(j,i)~=0
             s(j,i)=0;
-            paint=0;
+            paintit=0;
         elseif s(j,i)~=0
-            paint=paint+(res^0.5);
+            paintit=paintit+(res^0.5);
         end
     end
 end

@@ -6,7 +6,7 @@ function [Path] = Pathfinder3(shade)
 
     archive=ones([ylim,xlim]);      %Tracks which pixels have been checked
     sumcheck=sum(archive,'all');    %Checks algorithm progress
-    sumcheck0=sum(archive,'all');   %initial number of pixels
+    initsumcheck=sum(archive,'all');   %initial number of pixels
     output='%3.2f%% Complete\n';
     i=1;                            %x-coordinate
     j=1;                            %y-coordinate
@@ -14,7 +14,7 @@ function [Path] = Pathfinder3(shade)
     xlist=([50000]);                %List of x-coordinates to visit
     ylist=([50000]);                %List of y-coordinates to visit
     radius=1;                       %Box-search radius
-    wait=waitbar((1-sumcheck/sumcheck0),'Creating Path','Name','Progress Bar');
+    wait=waitbar((1-sumcheck/initsumcheck),'Creating Path','Name','Progress Bar');
     
 
     %No need to visit whitespace, sets all whitespace to 'checked'
@@ -28,13 +28,13 @@ function [Path] = Pathfinder3(shade)
 
     %Main Pathfinder
     while sumcheck~=0
-        percent=1-sumcheck/sumcheck0;
+        percent=1-sumcheck/initsumcheck;
         if percent>0.85 && mod(100*(percent),1)==0
             waitbar(percent,wait,'Finishing Up');
         elseif mod(100*(percent),1)==0
             waitbar(percent,wait);
         end
-        fprintf(output,100*(1-sumcheck/sumcheck0))
+        fprintf(output,100*(1-sumcheck/initsumcheck))
         %MrHouse is in charge of gambling, random probability if a shade
         %pixel is visited
         mrhouse=randi([1,100]);
