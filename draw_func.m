@@ -1,5 +1,5 @@
-function [CenterPath] = draw_func(shade,image)
-    CompletedPath=Pathfinder3(shade);
+function [CenterPath] = draw_func(image)
+    CompletedPath=Pathfinder3(image);
     figure(1);
     h=animatedline;
     res=5;

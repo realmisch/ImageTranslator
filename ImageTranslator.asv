@@ -4,13 +4,13 @@
 clear
 clc
 
-I_color = imread('testimage2.png');
+I_color = imread('testimage3.png');
 I = rgb2gray(I_color);
 I_dbl = double(I);
 [ylim,xlim]=size(I_dbl);
 orientation='down';
 
-res=1;
+res=5;
 paintit=1;
 
 %Checks orientation and changes image. Orientation from bottom of image.
@@ -40,7 +40,7 @@ end
 %Getting shading values for every pixel
 for i=1:1:xlim
     for j=1:1:ylim
-        if paintit>=100 && I_dbl(j,i)<220
+        if paintit>=100 && I_dbl(j,i)<200
             I_dbl(j,i)=255;
             paintit=paintit-100;
         elseif I_dbl(j,i)<200
