@@ -1,4 +1,4 @@
-function [Path] = Pathfinder3(I_dbl)
+function [Path] = Pathfinder3(I_dbl,tol)
     %Pathfinder Version 3.0
     %Now with shades!
     %James Nellis 2021
@@ -15,7 +15,7 @@ function [Path] = Pathfinder3(I_dbl)
     ylist=([50000]);                %List of y-coordinates to visit
     radius=1;                       %Box-search radius
     wait=waitbar((1-sumcheck/initsumcheck),'Creating Path','Name','Progress Bar');
-    tolerance=1.2;
+    tolerance=tol;
     
 
     %No need to visit whitespace, sets all whitespace to 'checked'

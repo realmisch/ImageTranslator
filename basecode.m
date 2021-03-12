@@ -58,7 +58,7 @@ time=0; %This value of time pauses bewteen movements. note because of arduino an
 
 %pull up list of x,y points to travel to, mat
 %A seperate function should be put here.
-[mat]=dots();        
+[mat]=load("Pathcoordinates.mat");        
 
 
 %runs through each travel point using fuction moveitto.  This function
