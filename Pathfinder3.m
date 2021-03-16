@@ -36,18 +36,22 @@ function [Path] = Pathfinder3(I_dbl,tol)
             waitbar(percent,wait);
         end
         fprintf(output,100*(1-sumcheck/initsumcheck))
-        %MrHouse is in charge of gambling, random probability if a shade
-        %pixel is visited
-        mrhouse=randi([0,100]);
         
+        %Bender is in charge of gambling, random probability if a shade
+        %pixel is visited. "I'm gonna make my own park with Blackjack..."
+        bender=randi([0,100]);
+        
+        %Dynamic shading with 255 possible shades
         Probability=(1-(I_dbl(j,i)*tolerance)/255)*100;
+        
         %Creating the path, with probabilities for non-blackspace pixels
-        if archive(j,i)==1 && Probability>mrhouse
+        if archive(j,i)==1 && Probability>bender
             xlist(count)=i;
             ylist(count)=j;
             count=count+1;
         end
         archive(j,i)=0;
+        
         %Finding the next pixel using a box-search algorithm
         while archive(j,i)==0
             for m=-radius:1:radius
@@ -72,6 +76,7 @@ function [Path] = Pathfinder3(I_dbl,tol)
                     i=xindex;
                     j=j+radius;
                 end
+                %Stops chasing windmills when it found one
                 if archive(j,i)==1
                     break
                 end
@@ -88,7 +93,6 @@ function [Path] = Pathfinder3(I_dbl,tol)
         %"Good Enough" Approximation
         if sumcheck<100
             sumcheck=0;
-            %clc
             fprintf('100%% Complete');
         end
     end

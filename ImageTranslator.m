@@ -5,12 +5,12 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol)
     [ylim,xlim]=size(I_dbl);
     %orientation='down';
 
-    %res=1;
+    %Variables used to control resolution
     paintit=1;
     resvar=100-res;
 
     %Checks orientation and changes image. Orientation from bottom of image.
-    %'down' is default
+    %'Down' is default
     if strcmp(orientation,'Up')==1
         I_dbl=flip(I_dbl);
     elseif strcmp(orientation,'Left')==1
@@ -33,7 +33,7 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol)
         [ylim,xlim]=size(I_dbl);
     end
 
-    %Getting shading values for every pixel
+    %Determines if a pixel is painted or not from resolution parameters
     for i=1:1:xlim
         for j=1:1:ylim
             if paintit>=100 && I_dbl(j,i)<220
@@ -44,6 +44,7 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol)
             end
         end
     end
-
+    
+    %Returns the path to call
     CenterPath=draw_func(I_dbl,tol);
 end
