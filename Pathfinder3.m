@@ -7,7 +7,7 @@ function [Path] = Pathfinder3(I_dbl,tol)
     archive=ones([ylim,xlim]);      %Tracks which pixels have been checked
     sumcheck=sum(archive,'all');    %Checks algorithm progress
     initsumcheck=sum(archive,'all');   %initial number of pixels
-    output='%3.2f%% Complete\n';
+    %output='%3.2f%% Complete\n';
     i=1;                            %x-coordinate
     j=1;                            %y-coordinate
     count=1;                        %Path coordinate pair number
@@ -16,7 +16,6 @@ function [Path] = Pathfinder3(I_dbl,tol)
     radius=1;                       %Box-search radius
     wait=waitbar((1-sumcheck/initsumcheck),'Creating Path','Name','Progress Bar');
     tolerance=tol;
-    
 
     %No need to visit whitespace, sets all whitespace to 'checked'
     for w=1:xlim
@@ -26,7 +25,9 @@ function [Path] = Pathfinder3(I_dbl,tol)
             end
         end
     end
-
+    
+    tic
+    timeout=toc;
     %Main Pathfinder
     while sumcheck~=0
         percent=1-sumcheck/initsumcheck;
@@ -35,7 +36,7 @@ function [Path] = Pathfinder3(I_dbl,tol)
         elseif mod(100*(percent),1)==0
             waitbar(percent,wait);
         end
-        fprintf(output,100*(1-sumcheck/initsumcheck))
+        %fprintf(output,100*(1-sumcheck/initsumcheck))
         
         %Bender is in charge of gambling, random probability if a shade
         %pixel is visited. "I'm gonna make my own park with Blackjack..."
@@ -77,7 +78,7 @@ function [Path] = Pathfinder3(I_dbl,tol)
                     j=j+radius;
                 end
                 %Stops chasing windmills when it found one
-                if archive(j,i)==1
+                if archive(j,i)==1 || timeout>=60
                     break
                 end
             end
@@ -90,8 +91,11 @@ function [Path] = Pathfinder3(I_dbl,tol)
             end
         end
         sumcheck=sum(archive,'all');
+        
+        %Timeout to stop the path if it is taking too long
+        timeout=toc;
         %"Good Enough" Approximation
-        if sumcheck<100
+        if sumcheck<100 || timeout>=60
             sumcheck=0;
             fprintf('100%% Complete');
         end

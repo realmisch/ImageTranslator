@@ -5,10 +5,6 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol)
     [ylim,xlim]=size(I_dbl);
     %orientation='down';
 
-    %Variables used to control resolution
-    paintit=1;
-    resvar=100-res;
-
     %Checks orientation and changes image. Orientation from bottom of image.
     %'Down' is default
     if strcmp(orientation,'Up')==1
@@ -36,11 +32,10 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol)
     %Determines if a pixel is painted or not from resolution parameters
     for i=1:1:xlim
         for j=1:1:ylim
-            if paintit>=100 && I_dbl(j,i)<220
+            %Bender is in charge of gambling
+            bender=randi([1,100]);
+            if I_dbl(j,i)<220 && bender>res
                 I_dbl(j,i)=255;
-                paintit=paintit-100;
-            elseif I_dbl(j,i)<200
-                paintit=paintit+resvar;
             end
         end
     end
