@@ -43,5 +43,5 @@ end
 
 figure(1);
 draw_func(s,I_dbl)
-figure(2);
+figure(3);
 imshow(I);

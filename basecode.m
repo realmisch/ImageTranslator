@@ -49,7 +49,7 @@ currentdiry=1;
 %set initial backlash; number of steps after changeing direciton in order for
 %visible movement to occur. This is a positive value
 global backlashx backlashy;
-backlashx=8.5;
+backlashx=8;
 backlashy=9;
 
 global time;
