@@ -11,11 +11,11 @@
 %This changes when using different computers and different boards.
 
 function [] = basecode(path,PortNo)
-    clear global
-    Port = sprintf('com%d',PortNo);
+    clear global;
+
     global a; % create an arduino object
     
-    a = arduino(Port, 'Uno');  %this is an internal program in matlab that creates a follower program in the Arduino that is controlled by the leader matlab program.   The first time this runs it will take a little longer as it will downlad the follower program into the arduino.
+    a = arduino(PortNo, 'Uno');  %this is an internal program in matlab that creates a follower program in the Arduino that is controlled by the leader matlab program.   The first time this runs it will take a little longer as it will downlad the follower program into the arduino.
     %Set and configure pins for arduino
     global stepX dirX stepY dirY enPin;
 
