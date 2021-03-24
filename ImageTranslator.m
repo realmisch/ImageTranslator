@@ -4,6 +4,7 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol)
     I_dbl = double(I);
     [ylim,xlim]=size(I_dbl);
     %orientation='down';
+    I_dbl = imsharpen(I_dbl,'Radius',2,'Amount',tol);
 
     %Checks orientation and changes image. Orientation from bottom of image.
     %'Down' is default
@@ -33,7 +34,7 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol)
     for i=1:1:xlim
         for j=1:1:ylim
             %Bender is in charge of gambling
-            bender=randi([1,100]);
+            bender=randi([0,99]);
             if I_dbl(j,i)<220 && bender>res
                 I_dbl(j,i)=255;
             end

@@ -7,7 +7,7 @@ function [Path] = Pathfinder3(I_dbl,tol)
     archive=ones([ylim,xlim]);      %Tracks which pixels have been checked
     sumcheck=sum(archive,'all');    %Checks algorithm progress
     initsumcheck=sum(archive,'all');   %initial number of pixels
-    %output='%3.2f%% Complete\n';
+    output='%3.2f%% Complete\n';
     i=1;                            %x-coordinate
     j=1;                            %y-coordinate
     count=1;                        %Path coordinate pair number
@@ -36,11 +36,11 @@ function [Path] = Pathfinder3(I_dbl,tol)
         elseif mod(100*(percent),1)==0
             waitbar(percent,wait);
         end
-        %fprintf(output,100*(1-sumcheck/initsumcheck))
+        fprintf(output,100*(1-sumcheck/initsumcheck))
         
         %Bender is in charge of gambling, random probability if a shade
         %pixel is visited. "I'm gonna make my own park with Blackjack..."
-        bender=randi([0,100]);
+        bender=randi([0,99]);
         
         %Dynamic shading with 255 possible shades
         Probability=(1-(I_dbl(j,i)*tolerance)/255)*100;
@@ -55,7 +55,7 @@ function [Path] = Pathfinder3(I_dbl,tol)
         
         %Finding the next pixel using a box-search algorithm
         while archive(j,i)==0
-            for m=-radius:1:radius
+            for m=-radius:radius
                 xindex=i+m;
                 yindex=j+m;
                 if xindex<=0 || xindex>xlim || yindex<=0 || yindex>ylim
@@ -89,8 +89,15 @@ function [Path] = Pathfinder3(I_dbl,tol)
             else
                 radius=1;
             end
+            if radius>1000
+                break
+            end
         end
-        sumcheck=sum(archive,'all');
+        if radius>1000
+            sumcheck=0;
+        else
+            sumcheck=sum(archive,'all');
+        end
         
         %Timeout to stop the path if it is taking too long
         timeout=toc;
