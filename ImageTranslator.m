@@ -3,8 +3,7 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol)
     I = rgb2gray(I_color);
     I_dbl = double(I);
     [ylim,xlim]=size(I_dbl);
-    %orientation='down';
-    I_dbl = imsharpen(I_dbl,'Radius',2,'Amount',tol);
+    I_dbl = imsharpen(I_dbl,'Radius',3,'Amount',tol);
 
     %Checks orientation and changes image. Orientation from bottom of image.
     %'Down' is default

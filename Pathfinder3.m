@@ -1,6 +1,6 @@
 function [Path] = Pathfinder3(I_dbl,tol)
     %Pathfinder Version 3.0
-    %Now with shades!
+    %Now with User Control!
     %James Nellis 2021
     [ylim,xlim]=size(I_dbl);
 

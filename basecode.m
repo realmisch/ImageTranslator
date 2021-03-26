@@ -66,6 +66,8 @@ function [] = basecode(path,PortNo)
 
     for i=1:length(mat)
     moveitto(mat(1,i),mat(2,i));
+    percent=100*i/length(mat);
+    fprintf('Drawing %3.2f Complete',percent)
     end
 
 
