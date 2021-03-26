@@ -1,6 +1,6 @@
-function [Path] = Pathfinder3(I_dbl)
+function [Path] = Pathfinder3(I_dbl,tol)
     %Pathfinder Version 3.0
-    %Now with shades!
+    %Now with User Control!
     %James Nellis 2021
     [ylim,xlim]=size(I_dbl);
 
@@ -15,8 +15,7 @@ function [Path] = Pathfinder3(I_dbl)
     ylist=([50000]);                %List of y-coordinates to visit
     radius=1;                       %Box-search radius
     wait=waitbar((1-sumcheck/initsumcheck),'Creating Path','Name','Progress Bar');
-    tolerance=1.2;
-    
+    tolerance=tol;
 
     %No need to visit whitespace, sets all whitespace to 'checked'
     for w=1:xlim
@@ -26,7 +25,9 @@ function [Path] = Pathfinder3(I_dbl)
             end
         end
     end
-
+    
+    tic
+    timeout=toc;
     %Main Pathfinder
     while sumcheck~=0
         percent=1-sumcheck/initsumcheck;
@@ -36,21 +37,25 @@ function [Path] = Pathfinder3(I_dbl)
             waitbar(percent,wait);
         end
         fprintf(output,100*(1-sumcheck/initsumcheck))
-        %MrHouse is in charge of gambling, random probability if a shade
-        %pixel is visited
-        mrhouse=randi([0,100]);
         
+        %Bender is in charge of gambling, random probability if a shade
+        %pixel is visited. "I'm gonna make my own park with Blackjack..."
+        bender=randi([0,99]);
+        
+        %Dynamic shading with 255 possible shades
         Probability=(1-(I_dbl(j,i)*tolerance)/255)*100;
+        
         %Creating the path, with probabilities for non-blackspace pixels
-        if archive(j,i)==1 && Probability>mrhouse
+        if archive(j,i)==1 && Probability>bender
             xlist(count)=i;
             ylist(count)=j;
             count=count+1;
         end
         archive(j,i)=0;
+        
         %Finding the next pixel using a box-search algorithm
         while archive(j,i)==0
-            for m=-radius:1:radius
+            for m=-radius:radius
                 xindex=i+m;
                 yindex=j+m;
                 if xindex<=0 || xindex>xlim || yindex<=0 || yindex>ylim
@@ -72,7 +77,8 @@ function [Path] = Pathfinder3(I_dbl)
                     i=xindex;
                     j=j+radius;
                 end
-                if archive(j,i)==1
+                %Stops chasing windmills when it found one
+                if archive(j,i)==1 || timeout>=60
                     break
                 end
             end
@@ -83,12 +89,21 @@ function [Path] = Pathfinder3(I_dbl)
             else
                 radius=1;
             end
+            if radius>1000
+                break
+            end
         end
-        sumcheck=sum(archive,'all');
-        %"Good Enough" Approximation
-        if sumcheck<100
+        if radius>1000
             sumcheck=0;
-            %clc
+        else
+            sumcheck=sum(archive,'all');
+        end
+        
+        %Timeout to stop the path if it is taking too long
+        timeout=toc;
+        %"Good Enough" Approximation
+        if sumcheck<100 || timeout>=60
+            sumcheck=0;
             fprintf('100%% Complete');
         end
     end

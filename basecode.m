@@ -10,64 +10,66 @@
 %proper port by going into the arduino app and seeing what port is opened.
 %This changes when using different computers and different boards.
 
+function [] = basecode(path,PortNo)
+    clear global;
 
-clear all
+    global a; % create an arduino object
+    
+    a = arduino(PortNo, 'Uno');  %this is an internal program in matlab that creates a follower program in the Arduino that is controlled by the leader matlab program.   The first time this runs it will take a little longer as it will downlad the follower program into the arduino.
+    %Set and configure pins for arduino
+    global stepX dirX stepY dirY enPin;
 
-global a; % create an arduino object
+    stepX = 'D2';
+    dirX  = 'D5';
+    stepY = 'D3';
+    dirY  = 'D6';
+    enPin = 'D8';
 
-a = arduino('com3', 'Uno');  %this is an internal program in matlab that creates a follower program in the Arduino that is controlled by the leader matlab program.   The first time this runs it will take a little longer as it will downlad the follower program into the arduino.
+    configurePin(a,'D2','DigitalOutput')
+    configurePin(a,'D5','DigitalOutput')
+    configurePin(a,'D3','DigitalOutput')
+    configurePin(a,'D6','DigitalOutput')
+    configurePin(a,'D8','DigitalOutput')
 
-%Set and configure pins for arduino
-global stepX dirX stepY dirY enPin;
+    % Set initial position, lower left hand corner
+    %note full range is approximately rangex=875 full rangey=610
+    %repeatively going out of range causes the cables to slip in the
+    %etch-a-sketch and will wear it out more quickly
+    global currentx currenty;
+    currentx=0;
+    currenty=0;
 
-stepX = 'D2';
-dirX  = 'D5';
-stepY = 'D3';
-dirY  = 'D6';
-enPin = 'D8';
+    %establishes where backlash starts: 0 is negative, 1 is positive
+    %note initial value only influences minor position of x,y start axis
+    global currentdirx currentdiry;
+    currentdirx=1;
+    currentdiry=1;
 
-configurePin(a,'D2','DigitalOutput')
-configurePin(a,'D5','DigitalOutput')
-configurePin(a,'D3','DigitalOutput')
-configurePin(a,'D6','DigitalOutput')
-configurePin(a,'D8','DigitalOutput')
+    %set initial backlash; number of steps after changeing direciton in order for
+    %visible movement to occur. This is a positive value
+    global backlashx backlashy;
+    backlashx=8;
+    backlashy=9;
 
-% Set initial position, lower left hand corner
-%note full range is approximately rangex=875 full rangey=610
-%repeatively going out of range causes the cables to slip in the
-%etch-a-sketch and will wear it out more quickly
-global currentx currenty;
-currentx=0;
-currenty=0;
-
-%establishes where backlash starts: 0 is negative, 1 is positive
-%note initial value only influences minor position of x,y start axis
-global currentdirx currentdiry;
-currentdirx=1;
-currentdiry=1;
-
-%set initial backlash; number of steps after changeing direciton in order for
-%visible movement to occur. This is a positive value
-global backlashx backlashy;
-backlashx=8;
-backlashy=9;
-
-global time;
-time=0; %This value of time pauses bewteen movements. note because of arduino and matlab communication this can only increase the speed to a certain degree. 0 is full speed.
-
-
-%pull up list of x,y points to travel to, mat
-%A seperate function should be put here.
-[mat]=dots();        
+    global time;
+    time=0; %This value of time pauses bewteen movements. note because of arduino and matlab communication this can only increase the speed to a certain degree. 0 is full speed.
 
 
-%runs through each travel point using fuction moveitto.  This function
-%relies on the global variables that are setup in this program and therefore cannot be run
-%without the basecode.
+    %pull up list of x,y points to travel to, mat
+    %A seperate function should be put here.
+    [mat]=path;        
 
-for i=1:length(mat)
-moveitto(mat(i,1),mat(i,2));
+
+    %runs through each travel point using fuction moveitto.  This function
+    %relies on the global variables that are setup in this program and therefore cannot be run
+    %without the basecode.
+
+    for i=1:length(mat)
+    moveitto(mat(1,i),mat(2,i));
+    percent=100*i/length(mat);
+    fprintf('Drawing %3.2f Complete',percent)
+    end
+
+
+    clear all; %this line clears all the variables, including most importantly "a" which shuts down the stepper motors
 end
-
-
-clear all; %this line clears all the variables, including most importantly "a" which shuts down the stepper motors
