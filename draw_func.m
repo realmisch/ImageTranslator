@@ -2,7 +2,6 @@ function [CenterPath] = draw_func(image,tol)
     CompletedPath=Pathfinder3(image,tol);
     figure('Name','Preview Image');
     h=animatedline;
-    res=5;
     axis([0,875,0,640])
     [ysize,xsize]=size(image);
     addpoints(h,1,1)
