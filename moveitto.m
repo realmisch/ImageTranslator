@@ -1,4 +1,4 @@
-%this function will travel to the commanded x,y position put in.
+cl%this function will travel to the commanded x,y position put in.
 
 
 function [] = moveitto(gox,goy)

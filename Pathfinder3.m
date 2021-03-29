@@ -16,25 +16,29 @@ function [Path] = Pathfinder3(I_dbl,tol)
     radius=1;                       %Box-search radius
     wait=waitbar((1-sumcheck/initsumcheck),'Creating Path','Name','Progress Bar');
     tolerance=tol;
-
+    Edges=edge(I_dbl,'Sobel');
+    
     %No need to visit whitespace, sets all whitespace to 'checked'
     for w=1:xlim
         for v=1:ylim
             if I_dbl(v,w)>=220
                 archive(v,w)=0;
             end
+            if Edges(v,w)==1
+                I_dbl(v,w)=0;
+            end
         end
     end
     
+    mask=(I_dbl<150);
     tic
     timeout=toc;
     %Main Pathfinder
     while sumcheck~=0
         percent=1-sumcheck/initsumcheck;
-        if percent>0.85 && mod(100*(percent),1)==0
-            waitbar(percent,wait,'Finishing Up');
-        elseif mod(100*(percent),1)==0
-            waitbar(percent,wait);
+        if mod(100*(percent),1)==0
+            percentage=sprintf('%3.f%% Complete',percent*100);
+            waitbar(percent,wait,percentage);
         end
         fprintf(output,100*(1-sumcheck/initsumcheck))
         
@@ -56,6 +60,8 @@ function [Path] = Pathfinder3(I_dbl,tol)
         %Finding the next pixel using a box-search algorithm
         while archive(j,i)==0
             for m=-radius:radius
+                cury=j;
+                curx=i;
                 xindex=i+m;
                 yindex=j+m;
                 if xindex<=0 || xindex>xlim || yindex<=0 || yindex>ylim
@@ -78,7 +84,7 @@ function [Path] = Pathfinder3(I_dbl,tol)
                     j=j+radius;
                 end
                 %Stops chasing windmills when it found one
-                if archive(j,i)==1 || timeout>=60
+                if archive(j,i)==1 %|| timeout>=60
                     break
                 end
             end
@@ -86,14 +92,27 @@ function [Path] = Pathfinder3(I_dbl,tol)
             %farther
             if archive(j,i)==0
                 radius=radius+1;
+            elseif archive(j,i)==1 && radius>5
+                radius=1;
+                xpoints=[i,curx];
+                ypoints=[j,cury];
+                planner=bwdistgeodesic(mask,xpoints,ypoints,'chessboard');
+                planner(isnan(planner))=inf;
+                [row,col]=find(planner==1);
+                for u=1:length(row)-1
+                   xlist(count)=col(u);
+                   ylist(count)=row(u);
+                   archive(ylist(count),xlist(count))=0;
+                   count=count+1;
+                end
             else
                 radius=1;
             end
-            if radius>1000
+            if radius>=10000
                 break
             end
         end
-        if radius>1000
+        if radius>10000
             sumcheck=0;
         else
             sumcheck=sum(archive,'all');
@@ -102,9 +121,9 @@ function [Path] = Pathfinder3(I_dbl,tol)
         %Timeout to stop the path if it is taking too long
         timeout=toc;
         %"Good Enough" Approximation
-        if sumcheck<100 || timeout>=60
+        if sumcheck<100 %|| timeout>=60
             sumcheck=0;
-            fprintf('100%% Complete');
+            fprintf('100%% Complete\n');
         end
     end
     close(wait)

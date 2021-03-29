@@ -64,10 +64,16 @@ function [] = basecode(path,PortNo)
     %relies on the global variables that are setup in this program and therefore cannot be run
     %without the basecode.
 
+    wait=waitbar(0,'Drawing Image','Name','Drawing Progress');
     for i=1:length(mat)
     moveitto(mat(1,i),mat(2,i));
     percent=100*i/length(mat);
     fprintf('Drawing %3.2f%% Complete\n',percent)
+    etasec=(100-percent)/(0.02);
+    etamin=etasec%60;
+    etahr=etamin%60;
+    msg=sprintf('Drawing %3.2f%% Complete\n ETA: %2.0f Hrs %2.0f Min %2.0f Sec',percent,etahr,etamin,etasec);
+    waitbar(percent/100,wait);
     end
 
 

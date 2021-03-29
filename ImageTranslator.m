@@ -29,12 +29,15 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol)
         [ylim,xlim]=size(I_dbl);
     end
 
+     Edges=edge(I_dbl,'Canny',0.9);
     %Determines if a pixel is painted or not from resolution parameters
     for i=1:1:xlim
         for j=1:1:ylim
             %Bender is in charge of gambling
             bender=randi([0,99]);
-            if I_dbl(j,i)<220 && bender>res
+            if Edges(j,i)==1
+                I_dbl(j,i)=0;
+            elseif I_dbl(j,i)<220 && bender>res
                 I_dbl(j,i)=255;
             end
         end
