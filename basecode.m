@@ -70,8 +70,10 @@ function [] = basecode(path,PortNo)
     percent=100*i/length(mat);
     fprintf('Drawing %3.2f%% Complete\n',percent)
     etasec=(100-percent)/(0.02);
-    etamin=etasec%60;
-    etahr=etamin%60;
+    etamin=cast(etasec/60,'uint8');
+    etahr=cast(etamin/60,'uint8');    
+    etasec=mod(etasec,60);
+    etamin=mod(etamin,60);
     msg=sprintf('Drawing %3.2f%% Complete\n ETA: %2.0f Hrs %2.0f Min %2.0f Sec',percent,etahr,etamin,etasec);
     waitbar(percent/100,wait);
     end
