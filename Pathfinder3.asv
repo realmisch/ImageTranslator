@@ -20,7 +20,8 @@ function [Path] = Pathfinder3(I_dbl,tol)
     Edges=edge(I_dbl,'Sobel');
     brightest=max(I_dbl,[],'all');
     darkest=min(I_dbl,[],'all');
-    Colorscale=brightest-darkest;
+    Colorscale=brightest(1)-darkest(1);
+    disp(Colorscale)
     
     %No need to visit whitespace, sets all whitespace to 'checked'
     for w=1:xlim
@@ -46,7 +47,6 @@ function [Path] = Pathfinder3(I_dbl,tol)
             drawnow
         end
         fprintf(output,100*(1-sumcheck/initsumcheck))
-         disp(brightest)
         if getappdata(wait,'canceling')
             break
         end
