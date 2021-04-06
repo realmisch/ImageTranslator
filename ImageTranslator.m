@@ -1,4 +1,4 @@
-function [CenterPath] = ImageTranslator(image,res,orientation,tol)
+function [CenterPath] = ImageTranslator(image,res,orientation,tol,geodesics)
     I_color = image;
     I = rgb2gray(I_color);
     I_dbl = double(I);
@@ -44,5 +44,5 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol)
     end
     
     %Returns the path to call
-    CenterPath=draw_func(I_dbl,tol);
+    CenterPath=draw_func(I_dbl,tol,geodesics);
 end

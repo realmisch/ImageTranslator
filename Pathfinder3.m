@@ -1,8 +1,9 @@
-function [Path] = Pathfinder3(I_dbl,tol)
+function [Path] = Pathfinder3(I_dbl,tol,geodesics)
     %Pathfinder Version 3.0
     %Now with User Control!
     %James Nellis 2021
     [ylim,xlim]=size(I_dbl);
+    disp(geodesics)
 
     archive=ones([ylim,xlim]);      %Tracks which pixels have been checked
     sumcheck=sum(archive,'all');    %Checks algorithm progress
@@ -18,9 +19,8 @@ function [Path] = Pathfinder3(I_dbl,tol)
     setappdata(wait,'canceling',0);
     tolerance=tol;
     Edges=edge(I_dbl,'Sobel');
-    brightest=max(I_dbl,[],'all');
-    darkest=min(I_dbl,[],'all');
-    Colorscale=brightest-darkest;
+    mask2=zeros([ylim,xlim]);
+    check=0;
     
     %No need to visit whitespace, sets all whitespace to 'checked'
     for w=1:xlim
@@ -31,14 +31,25 @@ function [Path] = Pathfinder3(I_dbl,tol)
             if Edges(v,w)==1
                 I_dbl(v,w)=0;
             end
+            if mod(w,10)==0
+                mask2(v,w)=1;
+            end
+            if mod(v,10)==0
+                mask2(v,w)=1;
+            end
         end
     end
     
-    mask=(I_dbl<150);
+    if geodesics==1
+        mask=(I_dbl<200);
+        mask2=mask2+mask;
+    end
+    
     tic
     timeout=toc;
     %Main Pathfinder
     while sumcheck~=0
+        jump=0;
         percent=1-sumcheck/initsumcheck;
         if mod(100*(percent),1)==0
             percentage=sprintf('%3.f%% Complete',percent*100);
@@ -46,7 +57,6 @@ function [Path] = Pathfinder3(I_dbl,tol)
             drawnow
         end
         fprintf(output,100*(1-sumcheck/initsumcheck))
-         disp(brightest)
         if getappdata(wait,'canceling')
             break
         end
@@ -101,28 +111,49 @@ function [Path] = Pathfinder3(I_dbl,tol)
             %farther
             if archive(j,i)==0
                 radius=radius+1;
-            elseif archive(j,i)==1 && radius>5
+            elseif archive(j,i)==1 && geodesics==1 && radius>2
                 radius=1;
                 xpoints=[i,curx];
                 ypoints=[j,cury];
-                planner=bwdistgeodesic(mask,xpoints,ypoints,'chessboard');
+                planner=bwdistgeodesic(mask,xpoints,ypoints,'quasi-euclidean');
                 planner(isnan(planner))=inf;
                 [row,col]=find(planner==1);
+                dist=(((row-cury).^2)+((col-curx).^2)).^0.5;
+                distpath=cat(2,cat(2,row,col),dist);
+                orderedpath=sortrows(distpath,3);
+                for k=2:length(row)-1
+                    jump=distpath(k,3)-distpath(k-1,3);
+                    if jump>10
+                        gridplanner=bwdistgeodesic(cast(mask2,'logical'),xpoints,ypoints,'quasi-euclidean');
+                        gridplanner(isnan(gridplanner))=inf;
+                        [row,col]=find(gridplanner==1);
+                        dist=(((row-cury).^2)+((col-curx).^2)).^0.5;
+                        distpath=cat(2,cat(2,row,col),dist);
+                        orderedpath=sortrows(distpath,3);
+                        break
+                    end
+                end
                 for u=1:length(row)-1
-                   xlist(count)=col(u);
-                   ylist(count)=row(u);
+                   xlist(count)=distpath(u,2);
+                   ylist(count)=distpath(u,1);
                    archive(ylist(count),xlist(count))=0;
                    count=count+1;
                 end
             else
                 radius=1;
+                check=0;
             end
-            if radius>=10000
+            if radius>=10000 && check==0
+                radius=0;
+                check=1;
+            elseif radius>=10000 && check==1
                 break
             end
         end
         if radius>10000
             sumcheck=0;
+            disp(geodesics)
+            fprintf('Radius too big')
         else
             sumcheck=sum(archive,'all');
         end

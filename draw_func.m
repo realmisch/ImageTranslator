@@ -1,5 +1,5 @@
-function [CenterPath] = draw_func(image,tol)
-    CompletedPath=Pathfinder3(image,tol);
+function [CenterPath] = draw_func(image,tol,geodesics)
+    CompletedPath=Pathfinder3(image,tol,geodesics);
     figure('Name','Preview Image');
     h=animatedline;
     axis([0,875,0,640])
