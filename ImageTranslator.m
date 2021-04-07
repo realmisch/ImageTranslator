@@ -1,9 +1,8 @@
-function [CenterPath] = ImageTranslator(image,res,orientation,tol,geodesics)
+function [CenterPath] = ImageTranslator(image,res,orientation,tol,geodesics,stretch)
     I_color = image;
     I = rgb2gray(I_color);
     I_dbl = double(I);
-    [ylim,xlim]=size(I_dbl);
-    I_dbl = imsharpen(I_dbl,'Radius',3,'Amount',tol);
+    I_dbl = imsharpen(I_dbl,'Radius',5,'Amount',tol,'threshold',0.1);
 
     %Checks orientation and changes image. Orientation from bottom of image.
     %'Down' is default
@@ -16,20 +15,27 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol,geodesics)
     end
 
     %Rescaling image to fit bounds
+    if strcmp(stretch,'Vert')==1
+        I_dbl=imresize(I_dbl,[640 NaN]);
+        [ylim,xlim]=size(I_dbl);
+    elseif strcmp(stretch,'Hor')==1
+        I_dbl=imresize(I_dbl,[NaN 875]);
+        [ylim,xlim]=size(I_dbl);
+    elseif strcmp(stretch,'Both')==1
+        I_dbl=imresize(I_dbl,[640 875]);
+        [ylim,xlim]=size(I_dbl);
+    end
+    
     if ylim>640
-        scale=640/ylim;
-        I_dbl=imresize(I_dbl,scale);
-        I_dbl=flip(I_dbl);
+        I_dbl=imresize(I_dbl,[640 xlim]);
         [ylim,xlim]=size(I_dbl);
     end
     if xlim>875
-        scale=875/xlim;
-        I_dbl=imresize(I_dbl,scale);
-        I_dbl=flip(I_dbl);
+        I_dbl=imresize(I_dbl,[ylim 640]);
         [ylim,xlim]=size(I_dbl);
     end
-
-     Edges=edge(I_dbl,'Canny',0.9);
+    I_dbl=flip(I_dbl);
+    Edges=edge(I_dbl,'Canny',0.9);
     %Determines if a pixel is painted or not from resolution parameters
     for i=1:1:xlim
         for j=1:1:ylim

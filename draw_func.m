@@ -24,6 +24,7 @@ function [CenterPath] = draw_func(image,tol,geodesics)
         end
     end
     inaccalc=100*inaccuracy/(xsize*ysize);
+    disp(count)
     fprintf('Path is %3.2f%% Accurate',inaccalc)
     CenterPath=cat(1,x,y);
 end
