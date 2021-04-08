@@ -3,6 +3,7 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol,geodesics,stre
     I = rgb2gray(I_color);
     I_dbl = double(I);
     I_dbl = imsharpen(I_dbl,'Radius',5,'Amount',tol,'threshold',0.1);
+    [ylim,xlim]=size(I_dbl);
 
     %Checks orientation and changes image. Orientation from bottom of image.
     %'Down' is default
@@ -27,11 +28,13 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol,geodesics,stre
     end
     
     if ylim>640
-        I_dbl=imresize(I_dbl,[640 xlim]);
+        scale=640/ylim;
+        I_dbl=imresize(I_dbl,scale);
         [ylim,xlim]=size(I_dbl);
     end
     if xlim>875
-        I_dbl=imresize(I_dbl,[ylim 640]);
+        scale=875/xlim;
+        I_dbl=imresize(I_dbl,scale);
         [ylim,xlim]=size(I_dbl);
     end
     I_dbl=flip(I_dbl);

@@ -1,18 +1,24 @@
 function [CenterPath] = draw_func(image,tol,geodesics)
     CompletedPath=Pathfinder3(image,tol,geodesics);
-    figure('Name','Preview Image');
+    f=figure('Name','Preview Image');
     h=animatedline;
     axis([0,875,0,640])
     [ysize,xsize]=size(image);
     inaccuracy=0;
     addpoints(h,1,1)
-    for count=1:length(CompletedPath)
+    numpoints=length(CompletedPath);
+    for count=1:numpoints
         %Centering the image assuming Etch-A-Sketch bounds
         x(count)=CompletedPath(1,count)+(875-xsize)/2;
         y(count)=CompletedPath(2,count)+(640-ysize)/2;
         addpoints(h,x(count),y(count))
     end
-    title('Preview Image')
+    hrs=numpoints/3600;
+    min=mod(numpoints,3600)/60;
+    sec=mod(numpoints,60);
+    disp(sec)
+    ETA=sprintf('Estimated Time to Completion: %2.0f Hr %2.0f Min %2.0f Sec',hrs,min,sec);
+    title(ETA)
     saveas(h,'compareimg.png');
     compareimg=imread('compareimg.png');
     dblimg=double(compareimg);

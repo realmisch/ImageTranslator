@@ -74,7 +74,7 @@ function [] = basecode(path,PortNo)
         moveitto(mat(1,i),mat(2,i));
         percent=100*i/length(mat);
         fprintf('Drawing %3.2f%% Complete\n',percent)
-        etasec=(100-percent)/(0.02);
+        etasec=(length(mat))/(2);
         etamin=cast(etasec/60,'uint8');
         etahr=cast(etamin/60,'uint8');
         etasec=mod(etasec,60);
