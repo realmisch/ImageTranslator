@@ -46,7 +46,7 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol,geodesics,stre
             bender=randi([0,99]);
             if Edges(j,i)==1
                 I_dbl(j,i)=0;
-            elseif I_dbl(j,i)<220 && bender>res
+            elseif bender>res
                 I_dbl(j,i)=255;
             end
         end
