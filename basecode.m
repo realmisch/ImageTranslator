@@ -15,7 +15,8 @@ function [] = basecode(path,PortNo)
 
     global a; % create an arduino object
     
-    a = arduino(PortNo, 'Uno');  %this is an internal program in matlab that creates a follower program in the Arduino that is controlled by the leader matlab program.   The first time this runs it will take a little longer as it will downlad the follower program into the arduino.
+    %this is an internal program in matlab that creates a follower program in the Arduino that is controlled by the leader matlab program.   The first time this runs it will take a little longer as it will downlad the follower program into the arduino.
+    a = arduino(PortNo, 'Uno');  
     %Set and configure pins for arduino
     global stepX dirX stepY dirY enPin;
 
@@ -66,21 +67,28 @@ function [] = basecode(path,PortNo)
 
     wait=waitbar(0,'Drawing Image','Name','Drawing Progress','CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
     setappdata(wait,'canceling',0);
+    %Calculate the distance taken by the path using Pythagorean Method
+    dist0=0;
+    for c=2:length(mat)
+        dist0=dist0+((mat(1,c)-mat(1,c-1)).^2+(mat(2,c)-mat(2,c-1)).^2).^(0.5);
+    end        
     
     for i=1:length(mat)
+        distance=0;
+        for j=2:i
+            distance=distance+((mat(1,j)-mat(1,j-1)).^2+(mat(2,j)-mat(2,j-1)).^2).^(0.5);
+        end
         if getappdata(wait,'canceling')
             break
         end
         moveitto(mat(1,i),mat(2,i));
-        percent=100*i/length(mat);
-        fprintf('Drawing %3.2f%% Complete\n',percent)
-        etasec=(length(mat))/(2);
-        etamin=cast(etasec/60,'uint8');
-        etahr=cast(etamin/60,'uint8');
-        etasec=mod(etasec,60);
-        etamin=mod(etamin,60);
-        msg=sprintf('Drawing %3.2f%% Complete\n ETA: %2.0f Hrs %2.0f Min %2.0f Sec',percent,etahr,etamin,etasec);
-        waitbar(percent/100,wait);
+        %List of variables to give an ETA assuming processing of two pixels
+        %per second
+        etahr=dist0/(2*3600);
+        etamin=mod(dist0,2*3600)/60;
+        etasec=mod(dist0,2*60);
+        msg=sprintf('Printing %3.2f%% Complete\n ETA: %2.0f Hrs %2.0f Min %2.0f Sec',percent,etahr,etamin,etasec);
+        waitbar(percent/100,wait,msg);
     end
 
 

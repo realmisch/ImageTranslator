@@ -31,6 +31,7 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
             if Edges(v,w)==1
                 I_dbl(v,w)=0;
             end
+            %Creates a new mask based on grids every 10 pixels
             if mod(w,10)==0
                 mask2(v,w)=1;
             end
@@ -39,17 +40,18 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
             end
         end
     end
-    
+    %Generates masks for geodesics, including less conservative mask2 with
+    %implemented grid
     if geodesics==1
         mask=(I_dbl<200);
         mask2=mask2+mask;
     end
-    
+    %Timeout functions if wanted to be implemented later
     tic
     timeout=toc;
     %Main Pathfinder
     while sumcheck~=0
-        jump=0;
+        %Percent update bar
         percent=1-sumcheck/initsumcheck;
         if mod(100*(percent),1)==0
             percentage=sprintf('%3.f%% Complete',percent*100);
@@ -57,6 +59,7 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
             drawnow
         end
         fprintf(output,100*(1-sumcheck/initsumcheck))
+        %Cancels function if user presses cancel button
         if getappdata(wait,'canceling')
             break
         end
@@ -83,6 +86,7 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
                 curx=i;
                 xindex=i+m;
                 yindex=j+m;
+                %Box search algorithm
                 if xindex<=0 || xindex>xlim || yindex<=0 || yindex>ylim
                     %We have fallen off the Flat Earth and found a turtle
                 elseif i-radius>0 && archive(yindex,i-radius)==1
@@ -112,6 +116,7 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
             if archive(j,i)==0
                 radius=radius+1;
             elseif archive(j,i)==1 && geodesics==1 && radius>2
+                %Geodesics search function if the user wants to use them
                 radius=1;
                 xpoints=[i,curx];
                 ypoints=[j,cury];
@@ -150,9 +155,9 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
                 break
             end
         end
+        %Ends program if it gets stuck
         if radius>10000
             sumcheck=0;
-            disp(geodesics)
             fprintf('Radius too big')
         else
             sumcheck=sum(archive,'all');
@@ -161,7 +166,7 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
         %Timeout to stop the path if it is taking too long
         timeout=toc;
         %"Good Enough" Approximation
-        if sumcheck<100 %|| timeout>=60
+        if sumcheck<10 %|| timeout>=60
             sumcheck=0;
             fprintf('100%% Complete\n');
         end
@@ -172,6 +177,7 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
         pause(1)
         close(finish)
     end
-    delete(wait)
     Path=cat(1,xlist,ylist);
+    %Close Waitbar
+    delete(wait)
 end

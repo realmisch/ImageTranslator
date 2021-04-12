@@ -38,8 +38,10 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol,geodesics,stre
         [ylim,xlim]=size(I_dbl);
     end
     I_dbl=flip(I_dbl);
+    %Detect Image Edges
     Edges=edge(I_dbl,'Canny',0.9);
-    %Determines if a pixel is painted or not from resolution parameters
+    %Determine if a pixel gets "painted" based on resolution and edge
+    %parameters
     for i=1:1:xlim
         for j=1:1:ylim
             %Bender is in charge of gambling
