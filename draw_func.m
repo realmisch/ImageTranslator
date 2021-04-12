@@ -21,14 +21,14 @@ function [CenterPath] = draw_func(image,tol,geodesics)
             addpoints(h,x(count),y(count))
         end
         %ETA variables based on the number of points
-        %Assumes motors process 2 pixels per second
+        %Assumes motors process 4.66 pixels per second
         dist0=0;
         for i=2:length(CompletedPath)
             dist0=dist0+((x(i)-x(i-1)).^2+(y(i)-y(i-1)).^2).^0.5;
         end
-        hrs=(dist0/2)/3600;
-        min=mod((dist0/2),3600)/60;
-        sec=mod((dist0/2),60);
+        hrs=(dist0/4.66)/3600;
+        min=mod((dist0/4.66),3600)/60;
+        sec=mod((dist0/4.66),60);
 
         ETA=sprintf('Estimated Time to Completion: %2.0f Hr %2.0f Min %2.0f Sec',hrs,min,sec);
         title(ETA)
@@ -39,7 +39,7 @@ function [CenterPath] = draw_func(image,tol,geodesics)
                 help=msgbox('Press "Enter" when you are finished','Help');
                 figure(f1)
                 %Allows user to draw on preview image
-                d=drawfreehand('Color','w','LineWidth',10,'InteractionsAllowed','None','Multiclick',true);
+                d=drawfreehand('Color','w','LineWidth',7,'InteractionsAllowed','None','Multiclick',true);
                 if exist('help','var')
                     delete(help);
                     clear('help');
@@ -50,7 +50,7 @@ function [CenterPath] = draw_func(image,tol,geodesics)
                 hold on
                 userx=dpoints(:,1);
                 usery=dpoints(:,2);
-                userline=animatedline('Color','w','LineWidth',10);
+                userline=animatedline('Color','w','LineWidth',7);
                 for v=1:length(userx)
                     addpoints(userline,userx(v),usery(v))
                 end

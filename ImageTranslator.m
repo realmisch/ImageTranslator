@@ -39,16 +39,20 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol,geodesics,stre
     end
     I_dbl=flip(I_dbl);
     %Detect Image Edges
-    Edges=edge(I_dbl,'Canny',0.9);
+    Edges=edge(I_dbl,'Canny',0.25);
     %Determine if a pixel gets "painted" based on resolution and edge
     %parameters
     for i=1:1:xlim
         for j=1:1:ylim
             %Bender is in charge of gambling
             bender=randi([0,99]);
+            %Make edges painted
             if Edges(j,i)==1
                 I_dbl(j,i)=0;
-            elseif bender>res
+            %Get a skeleton of the image if res is zero
+            elseif res==0 && Edges(j,i)==0
+                I_dbl(j,i)=255;
+            elseif res~=0 && bender>res
                 I_dbl(j,i)=255;
             end
         end

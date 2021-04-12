@@ -82,13 +82,13 @@ function [] = basecode(path,PortNo)
             break
         end
         moveitto(mat(1,i),mat(2,i));
-        %List of variables to give an ETA assuming processing of two pixels
+        %List of variables to give an ETA assuming processing of six pixels
         %per second
-        etahr=dist0/(2*3600);
-        etamin=mod(dist0,2*3600)/60;
-        etasec=mod(dist0,2*60);
-        msg=sprintf('Printing %3.2f%% Complete\n ETA: %2.0f Hrs %2.0f Min %2.0f Sec',percent,etahr,etamin,etasec);
-        waitbar(percent/100,wait,msg);
+        etahr=dist0/(6*3600);
+        etamin=mod(dist0,6*3600)/60;
+        etasec=mod(dist0,6*60);
+        msg=sprintf('Printing %3.2f%% Complete\n ETA: %2.0f Hrs %2.0f Min %2.0f Sec',100*distance/dist0,etahr,etamin,etasec);
+        waitbar(distance/dist0,wait,msg);
     end
 
 
