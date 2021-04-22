@@ -45,9 +45,8 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
     if geodesics==1
         mask=(I_dbl<200);
         mask2=mask2+mask;
-        bodycheck=bwlabel(mask);
     end
- 
+     bodycheck=bwlabel(mask);
     %Timeout functions if wanted to be implemented later
     tic
     timeout=toc;
@@ -117,6 +116,18 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
             %farther
             if archive(j,i)==0
                 radius=radius+1;
+            elseif archive(j,i)==1 && geodesics==1 && radius>2 && bodycheck(cury,curx)==bodycheck(j,i)
+                %Geodesics search function if the user wants to use them
+                [geox,geoy]=geodesicpathfind(curx,cury,i,j,mask,I_dbl);               
+                for u=1:length(geox)
+                   xlist(count)=geox(u);
+                   ylist(count)=geoy(u);
+                   archive(ylist(count),xlist(count))=0;
+                   count=count+1;
+                end
+                
+                radius=1;
+                check=0;
             else
                 radius=1;
                 check=0;
@@ -128,17 +139,6 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
                 break
             end
         end
-        if archive(j,i)==1 && geodesics==1 && abs(curx-i)>5 && abs(cury-j)>5 && bodycheck(cury,curx)==bodycheck(j,i)
-            %Geodesics search function if the user wants to use them
-            [geox,geoy]=geodesicpathfind(curx,cury,i,j,mask,I_dbl);
-            for u=1:length(geox)
-                xlist(count)=geox(u);
-                ylist(count)=geoy(u);
-                archive(ylist(count),xlist(count))=0;
-                count=count+1;
-            end
-        end
-           
         %Ends program if it gets stuck
         if radius>10000
             sumcheck=0;
@@ -160,11 +160,18 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
         finish=waitbar(1,'Complete','Name','Progress Bar');
         pause(1)
         close(finish)
-    end 
+    end
+    for m=2:length(xlist)
+        min=inf;
+        for k=m:length(xlist)
+            distance=(((xlist(m)-xlist(k)).^2)+((ylist(m)-ylist(k)).^2)).^(0.5);
+            if distance<min
+                placeholder=[0,0
+            
     Path=cat(1,xlist,ylist);
+    
     range=sprintf('A1:C%5.f',length(xlist));
     xlswrite('Path.xlsx',Path',range)
-    
     %Close Waitbar
     delete(wait)
 end
