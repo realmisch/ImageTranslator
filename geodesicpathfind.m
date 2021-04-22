@@ -1,5 +1,5 @@
-function [xpoints,ypoints] = geodesicpathfind(x1,y1,x2,y2,mask,I)
-mask=flip(mask);
+function [xpoints,ypoints] = geodesicpathfind(x1,y1,x2,y2,I)
+mask=(I<200);
 mask=bwmorph(mask,'clean');
 body=bwlabel(mask);
 [ylim,xlim]=size(I);
@@ -38,6 +38,9 @@ r=1;
 pnt=1;
 [row,col]=find(thin==1);
 nopnt=length(row);
+if max(max(body))~=1
+    pnt=nopnt;
+end
 
 while pnt<nopnt
     min=inf;
@@ -57,18 +60,15 @@ while pnt<nopnt
     if count>1 && branches(ylist(count-1),xlist(count-1))==1
         m=1;
         bw1(y(1),x(1))=0;
-        bw1(ylist(count),xlist(count))=1;
-        seed1=bw1==1;
+        bw1(cury,curx)=1;
+        seed1=(bw1==1);
         D1=bwdistgeodesic(mask,seed1,method);
         D2=bwdistgeodesic(mask,seed2,method);
         D=D1+D2;
         D=round(D*8)/8;
         D(isnan(D))=inf;
         paths=(imregionalmin(D));
-        cury=ylist(count);
-        curx=xlist(count);
         curpnt=[cury,curx];
-        count=1;
         r=1;
         pnt=1;
         [row,col]=find(thin==1);

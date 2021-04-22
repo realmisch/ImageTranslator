@@ -11,7 +11,7 @@ bw1=zeros([ylim,xlim]);
 bw2=bw1;
 
 [rowmask,colmask]=find(body==1);
-
+saveind=[2567,2921];
 index=2567;%randi([1,length(rowmask)]);
 index2=2921;%randi([1,length(rowmask)]);
 
@@ -68,7 +68,7 @@ while pnt<nopnt
     if count>1 && branches(ylist(count-1),xlist(count-1))==1
         m=1;
         bw1(y(1),x(1))=0;
-        bw1(ylist(count),xlist(count))=1;
+        bw1(cury,curx)=1;
         seed1=bw1==1;
         D1=bwdistgeodesic(mask,seed1,method);
         D2=bwdistgeodesic(mask,seed2,method);
@@ -76,10 +76,7 @@ while pnt<nopnt
         D=round(D*8)/8;
         D(isnan(D))=inf;
         paths=(imregionalmin(D));
-        cury=ylist(count);
-        curx=xlist(count);
         curpnt=[cury,curx];
-        count=1;
         r=1;
         pnt=1;
         [row,col]=find(thin==1);
@@ -90,28 +87,17 @@ while pnt<nopnt
     pnt=pnt+1;
     [row,col]=find(thin==1);
 end
-for m=1:length(xlist)-2
-    distA=sqrt(((xlist(m)-xlist(m+1)).^2)+((ylist(m)-ylist(m+1)).^2));
-    distB=sqrt(((xlist(m)-xlist(m+2)).^2)+((ylist(m)-ylist(m+2)).^2));
-    if distB<distA
-        placeholder=[xlist(m+1),ylist(m+1)];
-        xlist(m+1)=xlist(m+2);
-        ylist(m+1)=ylist(m+2);
-        xlist(m+2)=placeholder(1);
-        ylist(m+2)=placeholder(2);
-        m=1;
-    end
-end
+
 
 figure(1)
 axis([0 xlim 0 ylim])
 h=animatedline;
 if max(max(smoothcheck))==1
-for m=1:length(xlist)
-    addpoints(h,xlist(m),ylim-ylist(m))
-    drawnow
-    pause(0.01)
-end
+    for m=1:length(xlist)
+        addpoints(h,xlist(m),ylim-ylist(m))
+        drawnow
+        pause(0.01)
+    end
 end
 path=cat(1,xlist,ylist);
 

@@ -1,9 +1,9 @@
-function [CenterPath] = draw_func(image,tol,geodesics)
+function [CenterPath] = draw_func(image,tol,geodesics,shadeno)
     %Newpath sets draw_func to repeat unless user specifies otherwise
     %Used to automatically path edited images
     newpath=1;
     while newpath==1
-        CompletedPath=Pathfinder3(image,tol,geodesics);
+        CompletedPath=Pathfinder3(image,tol,geodesics,shadeno);
         f1=figure;
         h=animatedline;
         axis([0,875,0,640])

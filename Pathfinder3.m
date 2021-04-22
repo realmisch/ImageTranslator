@@ -1,4 +1,4 @@
-function [Path] = Pathfinder3(I_dbl,tol,geodesics)
+function [Path] = Pathfinder3(I_dbl,tol,geodesics,shadeno)
     %Pathfinder Version 3.0
     %Now with User Control!
     %James Nellis 2021
@@ -19,8 +19,8 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
     setappdata(wait,'canceling',0);
     tolerance=tol;
     Edges=edge(I_dbl,'Sobel');
-    mask2=zeros([ylim,xlim]);
     check=0;
+    bodysum=1;
     
     %No need to visit whitespace, sets all whitespace to 'checked'
     for w=1:xlim
@@ -31,22 +31,11 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
             if Edges(v,w)==1
                 I_dbl(v,w)=0;
             end
-            %Creates a new mask based on grids every 10 pixels
-            if mod(w,10)==0
-                mask2(v,w)=1;
-            end
-            if mod(v,10)==0
-                mask2(v,w)=1;
-            end
         end
     end
-    %Generates masks for geodesics, including less conservative mask2 with
-    %implemented grid
-    if geodesics==1
-        mask=(I_dbl<200);
-        mask2=mask2+mask;
-        bodycheck=bwlabel(mask);
-    end
+    %Generates masks for geodesics
+    mask=(I_dbl<200);
+    bodycheck=bwlabel(mask);
  
     %Timeout functions if wanted to be implemented later
     tic
@@ -72,9 +61,12 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
         
         %Dynamic shading with 255 possible shades
         Probability=(1-(I_dbl(j,i)*tolerance)/255)*100;
+        %Quantized Probability to improve distinguishing shades
+        %Dynamic Probability limited to 4 shades
+        qProbability=round(Probability*shadeno)*(1/shadeno);
         
         %Creating the path, with probabilities for non-blackspace pixels
-        if archive(j,i)==1 && Probability>bender
+        if archive(j,i)==1 && qProbability>bender
             xlist(count)=i;
             ylist(count)=j;
             count=count+1;
@@ -83,34 +75,43 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
         
         %Finding the next pixel using a box-search algorithm
         while archive(j,i)==0
+            cury=j;
+            curx=i;
+            for b=1:xlim
+                for c=1:ylim
+                    if bodycheck(c,b)==bodycheck(cury,curx)
+                        bodysum=bodysum+archive(c,b);
+                    end
+                end
+            end
             for m=-radius:radius
-                cury=j;
-                curx=i;
                 xindex=i+m;
                 yindex=j+m;
                 %Box search algorithm
                 if xindex<=0 || xindex>xlim || yindex<=0 || yindex>ylim
                     %We have fallen off the Flat Earth and found a turtle
-                elseif i-radius>0 && archive(yindex,i-radius)==1
+                elseif i-radius>0 && archive(yindex,i-radius)==1 && (bodycheck(j,i)==bodycheck(cury,curx) || bodysum==0)
                     %Searching Right Side of the box
                     i=i-radius;
                     j=yindex;
-                elseif i+radius<=xlim && archive(yindex,i+radius)==1
+                elseif i+radius<=xlim && archive(yindex,i+radius)==1 && (bodycheck(j,i)==bodycheck(cury,curx) || bodysum==0)
                     %Searching Left Side of the box
                     i=i+radius;
                     j=yindex;
-                elseif j-radius>0 && archive(j-radius,xindex)==1
+                elseif j-radius>0 && archive(j-radius,xindex)==1 && (bodycheck(j,i)==bodycheck(cury,curx) || bodysum==0)
                     %Searching Bottom of the box
                     i=xindex;
                     j=j-radius;
-                elseif j+radius<=ylim && archive(j+radius,xindex)==1
+                elseif j+radius<=ylim && archive(j+radius,xindex)==1 && (bodycheck(j,i)==bodycheck(cury,curx) || bodysum==0)
                     %Searching Top of the box
                     i=xindex;
                     j=j+radius;
                 end
+                
                 %Stops chasing windmills when it found one
-                if archive(j,i)==1 %|| timeout>=60
+                if archive(j,i)==1
                     break
+                    bodycheck=1;
                 end
             end
             %If a pixel is found, reset algorithm, if not, look harder and
@@ -128,9 +129,9 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
                 break
             end
         end
-        if archive(j,i)==1 && geodesics==1 && abs(curx-i)>5 && abs(cury-j)>5 && bodycheck(cury,curx)==bodycheck(j,i)
+        if archive(j,i)==1 && geodesics==1 && (abs(curx-i)>1 || abs(cury-j)>1)
             %Geodesics search function if the user wants to use them
-            [geox,geoy]=geodesicpathfind(curx,cury,i,j,mask,I_dbl);
+            [geox,geoy]=geodesicpathfind(curx,cury,i,j,I_dbl);
             for u=1:length(geox)
                 xlist(count)=geox(u);
                 ylist(count)=geoy(u);
@@ -162,8 +163,6 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics)
         close(finish)
     end 
     Path=cat(1,xlist,ylist);
-    range=sprintf('A1:C%5.f',length(xlist));
-    xlswrite('Path.xlsx',Path',range)
     
     %Close Waitbar
     delete(wait)
