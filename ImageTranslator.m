@@ -1,9 +1,11 @@
 function [CenterPath] = ImageTranslator(image,res,orientation,tol,geodesics,stretch,shadeno)
+    %Get user image and prepare for recreation
     I_color = image;
     I = rgb2gray(I_color);
     I_dbl = double(I);
     I_dbl = imsharpen(I_dbl,'Radius',5,'Amount',tol,'threshold',0.1);
     [ylim,xlim]=size(I_dbl);
+    %Remove every other pixel for easier Etch-A-Sketch drawing
     clean=0;
     for m=1:xlim
         for n=1:ylim
@@ -26,7 +28,7 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol,geodesics,stre
         I_dbl=imrotate(I_dbl,90);
     end
 
-    %Rescaling image to fit bounds
+    %Rescaling image to fit bounds and accomodate user stretch parameter
     if strcmp(stretch,'Vert')==1
         I_dbl=imresize(I_dbl,[640 NaN]);
         [ylim,xlim]=size(I_dbl);
@@ -49,6 +51,7 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol,geodesics,stre
         [ylim,xlim]=size(I_dbl);
     end
     I_dbl=flip(I_dbl);
+    
     %Detect Image Edges
     Edges=edge(I_dbl,'Canny',0.15);
     %Determine if a pixel gets "painted" based on resolution and edge

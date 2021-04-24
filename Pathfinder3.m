@@ -1,9 +1,8 @@
 function [Path] = Pathfinder3(I_dbl,tol,geodesics,shadeno)
-    %Pathfinder Version 3.0
-    %Now with User Control!
+    %Pathfinder Version 3.5
+    %Now with Shading and Geodesics!
     %James Nellis 2021
     [ylim,xlim]=size(I_dbl);
-    disp(geodesics)
 
     archive=ones([ylim,xlim]);      %Tracks which pixels have been checked
     sumcheck=sum(archive,'all');    %Checks algorithm progress
@@ -15,11 +14,15 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics,shadeno)
     xlist=([50000]);                %List of x-coordinates to visit
     ylist=([50000]);                %List of y-coordinates to visit
     radius=1;                       %Box-search radius
+    
     wait=waitbar((1-sumcheck/initsumcheck),'Creating Path','Name','Progress Bar','CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
     setappdata(wait,'canceling',0);
+    
     tolerance=tol;
     Edges=edge(I_dbl,'Sobel');
     check=0;
+    %Sum of all unvisited pixels in a continuous body to reduce whitespace
+    %lines
     bodysum=1;
     
     %No need to visit whitespace, sets all whitespace to 'checked'
@@ -33,13 +36,11 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics,shadeno)
             end
         end
     end
-    %Generates masks for geodesics
+    
+    %Generates masks for geodesics and labels continuous bodies
     mask=(I_dbl<200);
     bodycheck=bwlabel(mask);
  
-    %Timeout functions if wanted to be implemented later
-    tic
-    timeout=toc;
     %Main Pathfinder
     while sumcheck~=0
         %Percent update bar
@@ -49,6 +50,7 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics,shadeno)
             waitbar(percent,wait,percentage);
             drawnow
         end
+        
         fprintf(output,100*(1-sumcheck/initsumcheck))
         %Cancels function if user presses cancel button
         if getappdata(wait,'canceling')
@@ -61,8 +63,8 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics,shadeno)
         
         %Dynamic shading with 255 possible shades
         Probability=(1-(I_dbl(j,i)*tolerance)/255)*100;
-        %Quantized Probability to improve distinguishing shades
-        %Dynamic Probability limited to 4 shades
+        %Quantized Probability to improve distinguishing shades based on
+        %user parameter
         qProbability=round(Probability*shadeno)*(1/shadeno);
         
         %Creating the path, with probabilities for non-blackspace pixels
@@ -108,12 +110,13 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics,shadeno)
                     j=j+radius;
                 end
                 
-                %Stops chasing windmills when it found one
+                %Stops chasing windmills when it found a pixel
                 if archive(j,i)==1
                     break
                     bodycheck=1;
                 end
             end
+            
             %If a pixel is found, reset algorithm, if not, look harder and
             %farther
             if archive(j,i)==0
@@ -122,15 +125,19 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics,shadeno)
                 radius=1;
                 check=0;
             end
+            %Reset radius search if algorithm gets stuck
             if radius>=10000 && check==0
                 radius=0;
                 check=1;
+            %If algorithm is stuck again, break algorithm
             elseif radius>=10000 && check==1
                 break
+                check=0;
             end
         end
+        
+        %Geodesics search function if the user wants to use them
         if archive(j,i)==1 && geodesics==1 && (abs(curx-i)>1 || abs(cury-j)>1)
-            %Geodesics search function if the user wants to use them
             [geox,geoy]=geodesicpathfind(curx,cury,i,j,I_dbl);
             for u=1:length(geox)
                 xlist(count)=geox(u);
@@ -148,20 +155,21 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics,shadeno)
             sumcheck=sum(archive,'all');
         end
         
-        %Timeout to stop the path if it is taking too long
-        timeout=toc;
         %"Good Enough" Approximation
-        if sumcheck<10 %|| timeout>=60
+        if sumcheck<50
             sumcheck=0;
             fprintf('100%% Complete\n');
         end
     end
-    %Return the Path
+    
+    %Checks if user pressed cancel button on waitbar
     if getappdata(wait,'canceling')==0
         finish=waitbar(1,'Complete','Name','Progress Bar');
         pause(1)
         close(finish)
     end 
+    
+    %Return the Path
     Path=cat(1,xlist,ylist);
     
     %Close Waitbar
