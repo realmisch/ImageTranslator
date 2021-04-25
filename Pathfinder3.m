@@ -19,6 +19,7 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics,shadeno)
     setappdata(wait,'canceling',0);
     
     tolerance=tol;
+    %Redundant Edge detection to make them more visible
     Edges=edge(I_dbl,'Sobel');
     check=0;
     %Sum of all unvisited pixels in a continuous body to reduce whitespace

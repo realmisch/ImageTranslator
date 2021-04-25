@@ -1,6 +1,3 @@
-
-counter=0;
-while counter<1
 I=imread('testimage4.png');
 I=rgb2gray(I);
 I=double(I);
@@ -9,11 +6,12 @@ body=bwlabel(mask);
 [ylim,xlim]=size(I);
 bw1=zeros([ylim,xlim]);
 bw2=bw1;
-
+counter=0;
 [rowmask,colmask]=find(body==1);
-saveind=[2567,2921];
-index=2567;%randi([1,length(rowmask)]);
-index2=2921;%randi([1,length(rowmask)]);
+index=1;
+index2=2;
+
+while counter<length(rowmask)-1
 
 x=[colmask(index),colmask(index2)];
 y=[rowmask(index),rowmask(index2)];
@@ -95,8 +93,6 @@ h=animatedline;
 if max(max(smoothcheck))==1
     for m=1:length(xlist)
         addpoints(h,xlist(m),ylim-ylist(m))
-        drawnow
-        pause(0.01)
     end
 end
 path=cat(1,xlist,ylist);
@@ -113,4 +109,6 @@ hold off
 counter=counter+1;
 disp(counter)
 fprintf('Index 1 = %5.f\n x1,y1=%5.f   %5.f\n Index 2 = %5.f\n x2,y2=%5.f    %5.f\n',index,x(1),y(1),index2,x(2),y(2))
+index=index+1;
+index2=index2+1;
 end

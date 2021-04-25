@@ -7,6 +7,8 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol,geodesics,stre
     [ylim,xlim]=size(I_dbl);
     %Remove every other pixel for easier Etch-A-Sketch drawing
     clean=0;
+    maxvalue=max(max(I_dbl));
+    minvalue=min(min(I_dbl));
     for m=1:xlim
         for n=1:ylim
             clean=clean+1;
