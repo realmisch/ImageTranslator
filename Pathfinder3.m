@@ -41,7 +41,7 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics,shadeno)
     %Generates masks for geodesics and labels continuous bodies
     mask=(I_dbl<200);
     bodycheck=bwlabel(mask);
- 
+    
     %Main Pathfinder
     while sumcheck~=0
         %Percent update bar
@@ -52,7 +52,6 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics,shadeno)
             drawnow
         end
         
-        fprintf(output,100*(1-sumcheck/initsumcheck))
         %Cancels function if user presses cancel button
         if getappdata(wait,'canceling')
             break
