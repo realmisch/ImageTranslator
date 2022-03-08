@@ -32,23 +32,23 @@ function [CenterPath] = ImageTranslator(image,res,orientation,tol,geodesics,stre
 
     %Rescaling image to fit bounds and accomodate user stretch parameter
     if strcmp(stretch,'Vert')==1
-        I_dbl=imresize(I_dbl,[640 NaN]);
+        I_dbl=imresize(I_dbl,[635 NaN]);
         [ylim,xlim]=size(I_dbl);
     elseif strcmp(stretch,'Hor')==1
-        I_dbl=imresize(I_dbl,[NaN 875]);
+        I_dbl=imresize(I_dbl,[NaN 870]);
         [ylim,xlim]=size(I_dbl);
     elseif strcmp(stretch,'Both')==1
-        I_dbl=imresize(I_dbl,[640 875]);
+        I_dbl=imresize(I_dbl,[635 870]);
         [ylim,xlim]=size(I_dbl);
     end
     
-    if ylim>640
-        scale=640/ylim;
+    if ylim>635
+        scale=635/ylim;
         I_dbl=imresize(I_dbl,scale);
         [ylim,xlim]=size(I_dbl);
     end
-    if xlim>875
-        scale=875/xlim;
+    if xlim>870
+        scale=870/xlim;
         I_dbl=imresize(I_dbl,scale);
         [ylim,xlim]=size(I_dbl);
     end

@@ -86,7 +86,6 @@ function [] = basecode(path,PortNo)
         msg=sprintf('Printing %3.2f%% Complete',100*distance/dist0);
         waitbar(distance/dist0,wait,msg);
     end
-
-
+    delete(wait)
     clear all; %this line clears all the variables, including most importantly "a" which shuts down the stepper motors
 end

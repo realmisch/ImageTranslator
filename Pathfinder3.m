@@ -51,7 +51,7 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics,shadeno)
             waitbar(percent,wait,percentage);
             drawnow
         end
-        
+        disp(percent*100)
         %Cancels function if user presses cancel button
         if getappdata(wait,'canceling')
             break
@@ -158,7 +158,6 @@ function [Path] = Pathfinder3(I_dbl,tol,geodesics,shadeno)
         %"Good Enough" Approximation
         if sumcheck<50
             sumcheck=0;
-            fprintf('100%% Complete\n');
         end
     end
     

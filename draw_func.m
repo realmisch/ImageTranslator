@@ -6,7 +6,7 @@ function [CenterPath] = draw_func(image,tol,geodesics,shadeno)
         CompletedPath=Pathfinder3(image,tol,geodesics,shadeno);
         f1=figure;
         h=animatedline;
-        axis([0,875,0,640])
+        axis([0,870,0,635])
         %Remove axis visibility for editing
         set(gca,'xtick',[],'ytick',[])
         [ysize,xsize]=size(image);
@@ -16,8 +16,8 @@ function [CenterPath] = draw_func(image,tol,geodesics,shadeno)
         numpoints=length(CompletedPath);
         for count=1:numpoints
             %Centering the image assuming Etch-A-Sketch bounds
-            x(count)=CompletedPath(1,count)+(875-xsize)/2;
-            y(count)=CompletedPath(2,count)+(640-ysize)/2;
+            x(count)=CompletedPath(1,count)+(870-xsize)/2;
+            y(count)=CompletedPath(2,count)+(635-ysize)/2;
             addpoints(h,x(count),y(count))
         end
         %ETA variables based on the number of points
@@ -56,7 +56,7 @@ function [CenterPath] = draw_func(image,tol,geodesics,shadeno)
                 end
                 saveas(gcf,'Outputimg.png')
                 compareimg=double(rgb2gray(imcrop(imread('Outputimg.png'),[115.51 49.51 676.98 532.98])));
-                compareimg=imresize(compareimg,[640 875]);
+                compareimg=imresize(compareimg,[635 870]);
                 image=flip(compareimg);
                 close(f1)
                 imwrite(compareimg,'Outputimg.png');
